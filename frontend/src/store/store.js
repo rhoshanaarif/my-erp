@@ -11,6 +11,9 @@ import timetableReducer from './reducers/timetableReducer';
 import batchReducer from './reducers/batchReducer';
 import yearReducer from './reducers/yearReducer';
 import academicReducer from './reducers/academicReducer';
+import quotaReducer from './reducers/quotaReducer';
+import userroleReducer from './reducers/userroleReducer';
+import usertypeReducer from './reducers/usertypeReducer';
 
 const store = configureStore({
   reducer: { 
@@ -25,6 +28,9 @@ const store = configureStore({
     batches: batchReducer, 
     years: yearReducer,
     academics: academicReducer,
+    quotas: quotaReducer,
+    userroles: userroleReducer,
+    usertypes: usertypeReducer
   }
 });
 

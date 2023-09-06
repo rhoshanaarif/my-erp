@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_STATUS } from "../../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserRoles, userroleSelector } from "../../../store/reducers/userroleReducer";
+import { fetchUserTypes, usertypeSelector } from "../../../store/reducers/usertypeReducer";
+
 
 const ManageUsertype = () => {
   const [userRoles, setUserRoles] = useState([]);
@@ -17,28 +22,40 @@ const ManageUsertype = () => {
     status: "",
   });
 
+  const userroleloading = useSelector(userroleSelector).userroleloading
+  const userroleLoadData = useSelector(userroleSelector).loadData
+  const usertypeloading = useSelector(usertypeSelector).usertypeloading
+  const usertypeLoadData = useSelector(usertypeSelector).loadData
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    async function fetchUserRoles() {
-      try {
-        const response = await axios.get("http://localhost:3002/api/userrole");
-        setUserRoles(response.data);
-      } catch (error) {
-        console.error("Error fetching user roles:", error);
-      }
-    }
-
-    async function fetchUserTypes() {
-      try {
-        const response = await axios.get("http://localhost:3002/api/usertype");
-        setUserTypes(response.data);
-      } catch (error) {
-        console.error("Error fetching user types:", error);
-      }
-    }
-
-    fetchUserRoles();
-    fetchUserTypes();
+    dispatch(fetchUserRoles());
+    dispatch(fetchUserTypes())
   }, []);
+
+  useEffect(() => {
+    console.log(userroleloading, "userroleloading");
+    if (userroleloading === API_STATUS.FULFILLED) {
+      setUserRoles(userroleLoadData)
+     
+    }
+    if (userroleloading === API_STATUS.REJECTED) {
+      console.log("data got failed");
+    }
+  }, [userroleloading]);
+
+  useEffect(() => {
+    console.log(usertypeloading, "usertypeloading");
+    if (usertypeloading === API_STATUS.FULFILLED) {
+      setUserTypes(usertypeLoadData)
+     
+    }
+    if (usertypeloading === API_STATUS.REJECTED) {
+      console.log("data got failed");
+    }
+  }, [usertypeloading]);
+
+
   const openEditModal = (userType) => {
     setEditData({
       _id: userType._id,

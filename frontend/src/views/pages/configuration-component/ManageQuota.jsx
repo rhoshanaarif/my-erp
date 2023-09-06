@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_STATUS } from "../../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchQuotas, quotaSelector } from "../../../store/reducers/quotaReducer";
 
 const ManageQuota = () => {
   const [quota, setQuotaName] = useState("");
@@ -12,10 +15,24 @@ const ManageQuota = () => {
     quota: "",
     status: "",
   });
+  
+  const dispatch = useDispatch();
+  const quotaloading = useSelector(quotaSelector).quotaloading
+  const quotaLoadData = useSelector(quotaSelector).loadData
 
   useEffect(() => {
-    fetchQuotaList();
+    dispatch(fetchQuotas())
   }, []);
+
+  useEffect(() => {
+    console.log(quotaloading, "quotaloading");
+    if (quotaloading === API_STATUS.FULFILLED) {
+      setQuotaList(quotaLoadData)
+    }
+    if (quotaloading === API_STATUS.REJECTED) {
+      console.log("data got failed");
+    }
+  }, [quotaloading]);
 
   const openEditModal = (data) => {
     setEditModalOpen(true);
@@ -34,14 +51,14 @@ const ManageQuota = () => {
     setDeleteConfirmationOpen(false);
     setDeletingQuota(null);
   };
-  const fetchQuotaList = async () => {
-    try {
-      const response = await axios.get("http://localhost:3002/api/quota");
-      setQuotaList(response.data);
-    } catch (error) {
-      console.error("Error fetching quota data:", error);
-    }
-  };
+  // const fetchQuotaList = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:3002/api/quota");
+  //     setQuotaList(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching quota data:", error);
+  //   }
+  // };
   const handleConfirmDelete = async () => {
     console.log("handleConfirmDelete called");
     try {
@@ -53,7 +70,7 @@ const ManageQuota = () => {
 
       // Close the modal and fetch user roles again to update the table
       closeDeleteConfirmation();
-      fetchQuotaList();
+      dispatch(fetchQuotas())
     } catch (error) {
       console.error("Error deleting Quota data:", error);
     }
@@ -68,7 +85,7 @@ const ManageQuota = () => {
       console.log(response.data);
       closeEditModal();
       // Close the edit modal
-      fetchQuotaList();
+      dispatch(fetchQuotas())
     } catch (error) {
       console.error("Error updating quota data:", error);
     }
@@ -93,7 +110,7 @@ const ManageQuota = () => {
 
       setQuotaName("");
       setStatus("");
-      fetchQuotaList();
+      dispatch(fetchQuotas())
     } catch (error) {
       console.error("Error saving quota data:", error);
     }

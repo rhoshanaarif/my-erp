@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_STATUS } from "../../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserRoles, userroleSelector } from "../../../store/reducers/userroleReducer";
 
 const ManageUserRole = () => {
   const [userRole, setUserRole] = useState("");
@@ -9,10 +12,25 @@ const ManageUserRole = () => {
   const [editData, setEditData] = useState({ userRole: "", status: "" });
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [deletingUserRole, setDeletingUserRole] = useState('');
+  const userroleloading = useSelector(userroleSelector).userroleloading
+  const userroleLoadData = useSelector(userroleSelector).loadData
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
-    fetchUserRoles();
+    dispatch(fetchUserRoles())
   }, []);
+
+  useEffect(() => {
+    console.log(userroleloading, "userroleloading");
+    if (userroleloading === API_STATUS.FULFILLED) {
+      setUserRoles(userroleLoadData)
+     
+    }
+    if (userroleloading === API_STATUS.REJECTED) {
+      console.log("data got failed");
+    }
+  }, [userroleloading]);
   const openEditModal = (role) => {
     setEditModalOpen(true);
     setEditData(role);
@@ -31,14 +49,14 @@ const ManageUserRole = () => {
     setEditData({ userRole: "", status: "" });
   };
 
-  const fetchUserRoles = async () => {
-    try {
-      const response = await axios.get("http://localhost:3002/api/userrole");
-      setUserRoles(response.data);
-    } catch (error) {
-      console.error("Error fetching user roles:", error);
-    }
-  };
+  // const fetchUserRoles = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:3002/api/userrole");
+  //     setUserRoles(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching user roles:", error);
+  //   }
+  // };
   const handleConfirmDelete = async () => {
     console.log("handleConfirmDelete called");
     try {
@@ -50,7 +68,7 @@ const ManageUserRole = () => {
 
       // Close the modal and fetch user roles again to update the table
       closeDeleteConfirmation();
-      fetchUserRoles();
+      dispatch(fetchUserRoles());
     } catch (error) {
       console.error("Error deleting user role data:", error);
     }
@@ -66,7 +84,7 @@ const ManageUserRole = () => {
 
       // Close the modal and fetch user roles again to update the table
       closeEditModal();
-      fetchUserRoles();
+      dispatch(fetchUserRoles());
     } catch (error) {
       console.error("Error updating user role data:", error);
     }
@@ -92,7 +110,7 @@ const ManageUserRole = () => {
       setStatus("");
 
       // Fetch user roles again to update the table
-      fetchUserRoles();
+      dispatch(fetchUserRoles());
     } catch (error) {
       console.error("Error saving user role data:", error);
     }

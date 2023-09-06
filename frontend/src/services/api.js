@@ -207,4 +207,27 @@ export const getAcademics =  () => {
   return Http.get(baseURL + '/api/academic' )
 };
 
+//quota
+
+export const getQuotas =  () => {
+  const baseURL = getBaseEndpointUrl();
+  return Http.get(baseURL + '/api/quota' )
+};
+
+
+//userrole
+
+export const getUserRoles =  () => {
+  const baseURL = getBaseEndpointUrl();
+  return Http.get(baseURL + '/api/userrole' )
+};
+
+
+//usertype
+
+export const getUserTypes =  () => {
+  const baseURL = getBaseEndpointUrl();
+  return Http.get(baseURL + '/api/usertype' )
+};
+
 

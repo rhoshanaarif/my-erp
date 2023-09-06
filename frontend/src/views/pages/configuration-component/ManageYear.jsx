@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_STATUS } from "../../../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import {fetchYears, yearSelector} from "../../../store/reducers/yearReducer";
 
 const ManageYear = () => {
   const [studentYear, setStudentYear] = useState("");
@@ -13,10 +16,24 @@ const ManageYear = () => {
     status: "",
     _id: "",
   });
+  const yearloading = useSelector(yearSelector).yearloading;
+  const yearLoadData = useSelector(yearSelector).loadData;
+  const dispatch = useDispatch()
+
 
   useEffect(() => {
-    fetchYearList();
+    dispatch(fetchYears())
   }, []);
+
+  useEffect(() => {
+    console.log(yearloading, "yearloading");
+    if (yearloading === API_STATUS.FULFILLED) {
+      setYearList(yearLoadData);
+    }
+    if (yearloading === API_STATUS.REJECTED) {
+      console.log("data got failed");
+    }
+  }, [yearloading]);
   // Function to open the edit modal
   const handleEditButtonClick = (yearId) => {
     const selectedYear = yearList.find((year) => year._id === yearId);
@@ -44,7 +61,7 @@ const ManageYear = () => {
         status: editData.status,
       });
       closeEditModal();
-      fetchYearList();
+      dispatch(fetchYears())
     } catch (error) {
       console.error("Error editing year:", error);
     }
@@ -64,20 +81,20 @@ const ManageYear = () => {
         `http://localhost:3002/api/year/${selectedYearIdToDelete}`
       );
       closeDeleteConfirmationModal();
-      fetchYearList();
+      dispatch(fetchYears())
     } catch (error) {
       console.error("Error deleting year:", error);
     }
   };
 
-  const fetchYearList = async () => {
-    try {
-      const response = await axios.get("http://localhost:3002/api/year");
-      setYearList(response.data);
-    } catch (error) {
-      console.error("Error fetching years:", error);
-    }
-  };
+  // const fetchYearList = async () => {
+  //   try {
+  //     const response = await axios.get("http://localhost:3002/api/year");
+  //     setYearList(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching years:", error);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,7 +107,7 @@ const ManageYear = () => {
       setStudentYear("");
       setStatus("");
       // Refresh the year list
-      fetchYearList();
+      dispatch(fetchYears())
     } catch (error) {
       console.error("Error creating year:", error);
     }
